@@ -91,6 +91,10 @@ export function Header({ variant = "default", className }: HeaderProps) {
             <ThemeToggle />
             {session ? (
               <>
+                <Link href="/dashboard" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-2">Dashboard</Link>
+                <Link href="/funds" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-2">Funds</Link>
+                <Link href="/deals" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-2">Deals</Link>
+                <Link href="/companies" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-2">Companies</Link>
                 <Link href="/pricing">
                   <div className={`
                     flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-sm transition-all

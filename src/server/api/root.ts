@@ -1,4 +1,5 @@
 import { storageRouter } from "@/server/api/routers/storage";
+import { fundManagementRouter } from "@/modules/fund-management/server/router";
 import { productRouter } from "@/server/product/routers";
 import { billingRouter } from "@/server/billing/routers";
 import { orderRouter } from "@/server/order/routers";
@@ -52,6 +53,9 @@ export const appRouter = createTRPCRouter({
 
   // Telegram module
   telegram: telegramRouter,
+
+  // VC Fund Manager module
+  fundManagement: fundManagementRouter,
 });
 
 export type AppRouter = typeof appRouter;
