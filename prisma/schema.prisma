@@ -245,6 +245,15 @@ model User {
   touchSchedules            TouchSchedule[]
   supportTickets            SupportTicket[]
   notificationPreferences   UserNotificationPreference[]
+
+  // VC Fund Manager
+  funds              Fund[]
+  portfolioCompanies PortfolioCompany[]
+  capitalCalls       CapitalCall[]
+  distributions      Distribution[]
+  deals              Deal[]
+  lpInvestors        LPInvestor[]
+
   @@index([createdAt])
   @@index([deviceKeyAtSignup, createdAt])
   @@index([utmSource])
@@ -1455,4 +1464,204 @@ model SupportSyncCursor {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("support_sync_cursors")
+}
+
+// ============================================================================
+// VC Fund Manager — Business Entities
+// ============================================================================
+
+enum FundStatus {
+  ACTIVE
+  CLOSED
+  RAISING
+}
+
+enum CompanyStage {
+  SEED
+  SERIES_A
+  SERIES_B
+  SERIES_C
+  SERIES_D
+  GROWTH
+}
+
+enum DealStage {
+  SOURCING
+  SCREENING
+  DUE_DILIGENCE
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum DealStatus {
+  ACTIVE
+  WITHDRAWN
+  COMPLETED
+}
+
+enum CapitalCallStatus {
+  PENDING
+  ISSUED
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum DistributionStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum LPStatus {
+  ACTIVE
+  INACTIVE
+  COMMITTED
+}
+
+enum CompanyStatus {
+  ACTIVE
+  EXITED
+  WRITTEN_OFF
+}
+
+model Fund {
+  id          String     @id @default(cuid())
+  userId      String     @map("user_id")
+  name        String
+  description String?
+  strategy    String?
+  vintageYear Int        @map("vintage_year")
+  aum         BigInt     @default(0) // in cents
+  currency    String     @default("USD")
+  status      FundStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioCompanies PortfolioCompany[]
+  capitalCalls      CapitalCall[]
+  distributions     Distribution[]
+  deals             Deal[]
+  lpInvestors       LPInvestor[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("vc_funds")
+}
+
+model PortfolioCompany {
+  id             String        @id @default(cuid())
+  fundId         String        @map("fund_id")
+  userId         String        @map("user_id")
+  name           String
+  industry       String?
+  invested       BigInt        @default(0) // in cents
+  valuation      BigInt?       // current valuation in cents
+  ownershipPct   Float         @default(0) @map("ownership_pct")
+  stage          CompanyStage?
+  status         CompanyStatus @default(ACTIVE)
+  investmentDate DateTime?     @map("investment_date")
+  description    String?
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  fund Fund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([fundId])
+  @@index([userId])
+  @@index([userId, status])
+  @@map("vc_portfolio_companies")
+}
+
+model CapitalCall {
+  id          String            @id @default(cuid())
+  fundId      String            @map("fund_id")
+  userId      String            @map("user_id")
+  amount      BigInt            // in cents
+  dueDate     DateTime          @map("due_date")
+  status      CapitalCallStatus @default(PENDING)
+  description String?
+  issuedAt    DateTime?         @map("issued_at")
+  paidAt      DateTime?         @map("paid_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  fund Fund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([fundId])
+  @@index([userId])
+  @@index([fundId, status])
+  @@map("vc_capital_calls")
+}
+
+model Distribution {
+  id          String              @id @default(cuid())
+  fundId      String              @map("fund_id")
+  userId      String              @map("user_id")
+  amount      BigInt              // in cents
+  type        String              @default("DIVIDEND") // DIVIDEND | RETURN_OF_CAPITAL | EXIT_PROCEEDS
+  status      DistributionStatus  @default(PENDING)
+  date        DateTime            @map("date")
+  description String?
+  paidAt      DateTime?           @map("paid_at")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  fund Fund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([fundId])
+  @@index([userId])
+  @@index([fundId, status])
+  @@map("vc_distributions")
+}
+
+model Deal {
+  id              String    @id @default(cuid())
+  fundId          String    @map("fund_id")
+  userId          String    @map("user_id")
+  companyName     String    @map("company_name")
+  industry        String?
+  source          String?
+  stage           DealStage @default(SOURCING)
+  status          DealStatus @default(ACTIVE)
+  requestedAmount BigInt?   @map("requested_amount") // in cents
+  valuation       BigInt?
+  description     String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  fund Fund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([fundId])
+  @@index([userId])
+  @@index([userId, stage])
+  @@map("vc_deals")
+}
+
+model LPInvestor {
+  id               String  @id @default(cuid())
+  fundId           String  @map("fund_id")
+  userId           String  @map("user_id")
+  name             String
+  email            String?
+  committedCapital BigInt  @default(0) @map("committed_capital") // in cents
+  capitalBalance   BigInt  @default(0) @map("capital_balance") // remaining uncalled
+  status           LPStatus @default(COMMITTED)
+  notes            String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  fund Fund @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([fundId])
+  @@index([userId])
+  @@index([fundId, status])
+  @@map("vc_lp_investors")
 }

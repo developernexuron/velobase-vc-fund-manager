@@ -1,31 +1,31 @@
 "use client";
 
-import { Sparkles, Zap, Lock, CreditCard } from "lucide-react";
+import { Briefcase, LineChart, Users, GitMerge } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const features = [
   {
-    icon: Sparkles,
-    title: "AI-First Architecture",
-    description: "Multi-provider AI SDK with OpenAI, Anthropic, Google Gemini, and more — ready out of the box.",
+    icon: Briefcase,
+    title: "Fund Portfolio Dashboard",
+    description: "Centralized dashboard to track all fund investments, capital calls, and distributions in real-time.",
     color: "text-blue-500",
   },
   {
-    icon: Zap,
-    title: "Ship Fast",
-    description: "Auth, billing, payments, background jobs, and email — all pre-wired so you can focus on your core feature.",
+    icon: LineChart,
+    title: "Portfolio Company Tracking",
+    description: "Monitor portfolio company performance, valuations, milestones, and key metrics across all funds.",
     color: "text-purple-500",
   },
   {
-    icon: Lock,
-    title: "Production Ready",
-    description: "Rate limiting, abuse prevention, analytics, and admin dashboard included from day one.",
+    icon: Users,
+    title: "LP Investor Portal",
+    description: "Dedicated portal for limited partners to view fund performance, reports, and capital account balances.",
     color: "text-emerald-500",
   },
   {
-    icon: CreditCard,
-    title: "Flexible Billing",
-    description: "Stripe, Airwallex, crypto payments, and a credit-based system with subscriptions and promo codes.",
+    icon: GitMerge,
+    title: "Deal Flow Pipeline",
+    description: "Manage investment opportunities from sourcing through due diligence to closing with workflow automation.",
     color: "text-orange-500",
   },
 ];
@@ -40,16 +40,16 @@ export function Features() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8">
           <div className="max-w-2xl">
             <h2 className="text-sm font-medium text-blue-500 tracking-widest uppercase mb-6">
-              Framework Features
+              Core Capabilities
             </h2>
             <h3 className="text-4xl md:text-6xl font-medium tracking-tight text-foreground leading-[1.1]">
               Everything you need <br/>
-              <span className="text-muted-foreground">to launch your AI SaaS.</span>
+              <span className="text-muted-foreground">to manage your VC firm.</span>
             </h3>
           </div>
           
           <p className="text-lg text-muted-foreground max-w-sm leading-relaxed font-light">
-            A full-stack Next.js framework with all the infrastructure a solo developer needs to build, launch, and scale an AI product.
+            A comprehensive VC fund management platform with real-time analytics, investor reporting, and workflow automation.
           </p>
         </div>
 
